@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0",
+    "reflect-metadata": "^0.1.13",
     "typescript": "^3.5.2"
   }
 }
