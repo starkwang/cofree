@@ -11,7 +11,10 @@
   "dependencies": {
     "koa": "^2.7.0",
     "koa-router": "^7.4.0",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "node-dev": "^4.0.0",
     "typescript": "^3.5.2"
   }
 }
