@@ -1,29 +1,53 @@
 import { META_MODULE } from "./contants";
 
 
-export function createModule(module) {
+export function createApplication(module) {
     const moduleMeta = Reflect.getMetadata(META_MODULE, module)
-    console.log(moduleMeta)
 
-    const moduleInstance = {
+    const applicationInstance = {
         controllers: []
     }
-    moduleMeta.controllers.forEach(ctrl => {
-        const constructorParamsMeta = Reflect.getMetadata('design:paramtypes', ctrl)
-        const params = []
-        constructorParamsMeta.map(providerConstructor => {
-            const index = moduleMeta.providers.indexOf(providerConstructor)
-            if (index >= 0) {
-                params.push(new providerConstructor())
+
+    const providerInstancePool = new InstancePool()
+    moduleMeta.controllers.forEach(controllerConstructor => {
+        const controllerConstructorParamsMeta = Reflect.getMetadata('design:paramtypes', controllerConstructor)
+        const controllerContructorParams = []
+        controllerConstructorParamsMeta.map(providerConstructor => {
+            if (moduleMeta.providers.includes(providerConstructor)) {
+                const provider = providerInstancePool.get(providerConstructor)
+                controllerContructorParams.push(provider)
             } else {
                 throw new Error(`Cannot find provider: ${providerConstructor.name}`)
             }
         })
 
-        moduleInstance.controllers.push(new ctrl(...params))
+        applicationInstance.controllers.push(new controllerConstructor(...controllerContructorParams))
     })
 
-    return moduleInstance
+    return applicationInstance
+}
+
+class InstancePool {
+    private _pool
+    constructor() {
+        this._pool = []
+    }
+    add(instance) {
+        this._pool.push(instance)
+    }
+    get(instanceConstructor) {
+        for (let i = 0; i < this._pool.length; i++) {
+            const instance = this._pool[i]
+            if (instance instanceof instanceConstructor) {
+                return instance
+            }
+        }
+
+        // no instance contained
+        const instance = new instanceConstructor()
+        this._pool.push(instance)
+        return instance
+    }
 }
 
 // 标记可被注入类

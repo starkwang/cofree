@@ -1,15 +1,13 @@
-import * as Koa from 'koa'
-
-import { toKoaRouter, toScf } from './adapter'
-import { Get, Body } from './http'
+import { toKoaRouter, toScf, toExpress } from './adapter'
+import { Get, Body, Headers, Req } from './http'
 import { Module, Controller } from './module'
-import { Injectable, createModule } from './ioc'
+import { Injectable, createApplication } from './ioc'
 
 @Injectable()
 class FooProvider {
     constructor() { }
     say() {
-        return 'hello!'
+        return 'hello! stark!'
     }
 }
 
@@ -25,20 +23,30 @@ class FooController {
     }
 }
 
+@Controller()
+class BarController {
+    constructor(
+        private readonly fooProvider: FooProvider
+    ) {}
+
+    @Get('/headers')
+    async body(@Headers() headers) {
+        return JSON.stringify(headers)
+    }
+
+    async noRoute() {}
+}
+
 
 
 @Module({
-    controllers: [FooController],
+    controllers: [FooController, BarController],
     providers: [FooProvider]
 })
 class AppModule { }
 
-const mod = createModule(AppModule)
+const application = createApplication(AppModule)
 
-console.log(mod)
+const expressApp = toExpress(application)
 
-// toScf(FooController)(0, 1)
-
-var app = new Koa();
-app.use(toKoaRouter(FooController))
-app.listen(3000);
+expressApp.listen(3000);

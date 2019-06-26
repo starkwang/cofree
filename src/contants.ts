@@ -1,3 +1,6 @@
 export const META_ROUTE = 'META_ROUTE'
 export const META_BODY = 'META_BODY'
 export const META_MODULE = 'META_MODULE'
+export const META_HEADERS = 'META_HEADERS'
+export const META_REQ = 'META_REQ'
+export const META_RES = 'META_RES'
