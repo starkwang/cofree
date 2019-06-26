@@ -5,10 +5,6 @@
         "preserveConstEnums": true,
         "target": "es2018",
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "outDir": "dist"
-    },
-    "include": [
-        "src/**/*"
-    ]
+        "emitDecoratorMetadata": true
+    }
 }
