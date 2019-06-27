@@ -1,55 +1,9 @@
-import { toKoaRouter, toScf, toExpress } from '../src/adapter'
-import { Get, Body, Headers, Req } from '../src/http'
-import { Module, Controller } from '../src/module'
-import { Injectable, createApplication } from '../src/ioc'
+import { toExpress } from '../src/adapter'
 import * as request from 'supertest'
 import * as assert from 'assert'
+import application from './app'
 
-@Injectable()
-class FooProvider {
-    constructor() { }
-    say() {
-        return 'hello! stark!'
-    }
-}
-
-@Controller()
-class FooController {
-    constructor(
-        private readonly fooProvider: FooProvider
-    ) { }
-
-    @Get('/')
-    async index(@Body() body) {
-        return this.fooProvider.say()
-    }
-}
-
-@Controller()
-class BarController {
-    constructor(
-        private readonly fooProvider: FooProvider
-    ) { }
-
-    @Get('/headers')
-    async body(@Headers() headers) {
-        return JSON.stringify(headers)
-    }
-
-    async noRoute() { }
-}
-
-
-
-@Module({
-    controllers: [FooController, BarController],
-    providers: [FooProvider]
-})
-class AppModule { }
-
-const application = createApplication(AppModule)
 const expressApp = toExpress(application)
-
 
 describe('Array', function () {
     describe('#indexOf()', function () {
