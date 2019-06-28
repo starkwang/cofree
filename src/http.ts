@@ -1,25 +1,38 @@
 import 'reflect-metadata'
 import {
-    META_BODY,
-    META_ROUTE,
-    META_HEADERS,
-    META_REQ,
-    META_RES
+  META_BODY,
+  META_ROUTE,
+  META_HEADERS,
+  META_REQ,
+  META_RES,
 } from './contants'
 
 export function Get(path: string) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        Reflect.defineMetadata(META_ROUTE, {
-            path,
-            method: 'get'
-        }, descriptor.value)
-        return descriptor
-    }
+  return function(
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    Reflect.defineMetadata(
+      META_ROUTE,
+      {
+        path,
+        method: 'get',
+      },
+      descriptor.value
+    )
+    return descriptor
+  }
 }
 
 function createRouteDecorator(key) {
-    return () => function (target: Object, propertyKey: string, parameterIndex: number) {
-        Reflect.defineMetadata(key, parameterIndex, target[propertyKey])
+  return () =>
+    function(
+      target: Record<string, any>,
+      propertyKey: string,
+      parameterIndex: number
+    ) {
+      Reflect.defineMetadata(key, parameterIndex, target[propertyKey])
     }
 }
 
