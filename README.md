@@ -68,3 +68,11 @@ expressApp.listen(3000)
 import { toLambda } from '../src/adapter'
 export const handler = toLambda(application)
 ```
+
+# TODO
+
+- More decorators
+- Test mock
+- Implement my own Request and Response
+- Remove serverless-http in lambda adapter
+- Guards
