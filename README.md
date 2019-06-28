@@ -2,11 +2,11 @@
 
 A Node.js Server Framework for Cloud
 
-* Typescript ✔️
-* IoC ✔️
-* Easy Testing ✔️
-* HTTP Server ✔️
-* Serverless Function ✔️
+- Typescript ✔️
+- IoC ✔️
+- Easy Testing ✔️
+- HTTP Server ✔️
+- Serverless Function ✔️
 
 # Quick Start
 
@@ -17,49 +17,42 @@ import { Injectable, createApplication } from '../src/ioc'
 
 @Injectable()
 class FooProvider {
-    constructor() { }
-    say() {
-        return 'hello! stark!'
-    }
+  constructor() {}
+  say() {
+    return 'hello! stark!'
+  }
 }
 
 @Controller()
 class FooController {
-    constructor(
-        private readonly fooProvider: FooProvider
-    ) { }
+  constructor(private readonly fooProvider: FooProvider) {}
 
-    @Get('/')
-    async index(@Body() body) {
-        return this.fooProvider.say()
-    }
+  @Get('/')
+  async index(@Body() body) {
+    return this.fooProvider.say()
+  }
 }
 
 @Controller()
 class BarController {
-    constructor(
-        private readonly fooProvider: FooProvider
-    ) { }
+  constructor(private readonly fooProvider: FooProvider) {}
 
-    @Get('/headers')
-    async body(@Headers() headers) {
-        return JSON.stringify(headers)
-    }
+  @Get('/headers')
+  async body(@Headers() headers) {
+    return JSON.stringify(headers)
+  }
 
-    async noRoute() { }
+  async noRoute() {}
 }
 
-
-
 @Module({
-    controllers: [FooController, BarController],
-    providers: [FooProvider]
+  controllers: [FooController, BarController],
+  providers: [FooProvider],
 })
-class AppModule { }
+class AppModule {}
 
 const application = createApplication(AppModule)
 ```
-
 
 ## Create HTTP Server
 
