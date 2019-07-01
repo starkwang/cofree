@@ -5,6 +5,7 @@ import {
   META_HEADERS,
   META_REQ,
   META_RES,
+  META_REACT_SSR
 } from './contants'
 
 export function Get(path: string) {
@@ -17,7 +18,7 @@ export function Get(path: string) {
       META_ROUTE,
       {
         path,
-        method: 'get',
+        method: 'get'
       },
       descriptor.value
     )
@@ -43,3 +44,14 @@ export const Headers = createRouteDecorator(META_HEADERS)
 export const Req = createRouteDecorator(META_REQ)
 
 export const Res = createRouteDecorator(META_RES)
+
+export function ReactSSR() {
+  return function(
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    Reflect.defineMetadata(META_REACT_SSR, true, descriptor.value)
+    return descriptor
+  }
+}

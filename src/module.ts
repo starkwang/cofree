@@ -1,4 +1,4 @@
-import { META_MODULE } from './contants'
+import { META_MODULE, META_REACT_SSR } from './contants'
 export function Module(config) {
   return function<T extends { new (...args: any[]): {} }>(constructor: T) {
     Reflect.defineMetadata(META_MODULE, config, constructor)

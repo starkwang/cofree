@@ -5,6 +5,7 @@
         "preserveConstEnums": true,
         "target": "es2018",
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "jsx": "react"
     }
 }

@@ -5,8 +5,10 @@ import {
   META_HEADERS,
   META_REQ,
   META_RES,
+  META_REACT_SSR
 } from './contants'
 import * as express from 'express'
+import * as ReactDOMServer from 'react-dom/server'
 const serverless = require('serverless-http')
 
 export function toExpress(application) {
@@ -21,6 +23,10 @@ export function toExpress(application) {
         const metaHeaders = Reflect.getMetadata(META_HEADERS, controller[name])
         const metaReq = Reflect.getMetadata(META_REQ, controller[name])
         const metaRes = Reflect.getMetadata(META_RES, controller[name])
+        const metaReactSSR = Reflect.getMetadata(
+          META_REACT_SSR,
+          controller[name]
+        )
         if (metaRoute) {
           // 根据签名
           app[metaRoute.method](metaRoute.path, async (req, res) => {
@@ -31,7 +37,15 @@ export function toExpress(application) {
             if (metaReq !== undefined) routeParams[metaReq] = req
             if (metaRes !== undefined) routeParams[metaRes] = res
 
-            res.send(await controller[name](...routeParams))
+            if (metaReactSSR) {
+              res.send(
+                ReactDOMServer.renderToString(
+                  await controller[name](...routeParams)
+                )
+              )
+            } else {
+              res.send(await controller[name](...routeParams))
+            }
           })
         }
       })

@@ -34,7 +34,7 @@ class BarController {
 
 @Module({
   controllers: [FooController, BarController],
-  providers: [FooProvider],
+  providers: [FooProvider]
 })
 class AppModule {}
 

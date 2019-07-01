@@ -4,7 +4,7 @@ export function createApplication(module) {
   const moduleMeta = Reflect.getMetadata(META_MODULE, module)
 
   const applicationInstance = {
-    controllers: [],
+    controllers: []
   }
 
   const providerInstancePool = new InstancePool()

@@ -21,7 +21,7 @@ const inputEvent = {
     'user-agent':
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36',
     'x-anonymous-consumer': 'true',
-    'x-qualifier': '$LATEST',
+    'x-qualifier': '$LATEST'
   },
   httpMethod: 'GET',
   path: '/',
@@ -34,8 +34,8 @@ const inputEvent = {
     path: '/',
     serviceId: 'service-rggu3eoy',
     sourceIp: '14.17.22.35',
-    stage: 'test',
-  },
+    stage: 'test'
+  }
 }
 
 lambda(inputEvent).then(console.log)
