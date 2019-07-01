@@ -1,12 +1,16 @@
-# Tera
+# Cofree
 
 A Node.js Server Framework for Cloud
 
 - Typescript ✔️
 - IoC ✔️
 - Easy Testing ✔️
+
+Support:
+
 - HTTP Server ✔️
 - Serverless Function ✔️
+- Server Side Rendering ✔️
 
 # Quick Start
 
@@ -47,7 +51,7 @@ class BarController {
 
 @Module({
   controllers: [FooController, BarController],
-  providers: [FooProvider],
+  providers: [FooProvider]
 })
 class AppModule {}
 
