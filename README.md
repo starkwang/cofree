@@ -14,8 +14,17 @@ Support:
 
 # Quick Start
 
-```ts
-import { Get, Body, Headers, Req } from '../src/http'
+```tsx
+import {
+  Get,
+  Post,
+  FileInterceptor,
+  Body,
+  Headers,
+  Req,
+  ReactSSR,
+  UploadedFile
+} from '../src/http'
 import { Module, Controller } from '../src/module'
 import { Injectable, createApplication } from '../src/ioc'
 
@@ -44,6 +53,18 @@ class BarController {
   @Get('/headers')
   async body(@Headers() headers) {
     return JSON.stringify(headers)
+  }
+
+  @Get('/react-ssr')
+  @ReactSSR()
+  async reactSSR() {
+    return <div>Hello World!</div>
+  }
+
+  @Post('/upload')
+  @FileInterceptor('file')
+  async upload(@UploadedFile() file) {
+    return file.size
   }
 
   async noRoute() {}
