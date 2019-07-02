@@ -5,37 +5,58 @@ import {
   META_HEADERS,
   META_REQ,
   META_RES,
-  META_REACT_SSR
+  META_REACT_SSR,
+  META_FILE_INTERCEPTOR,
+  META_UPLOADED_FILE
 } from './contants'
 import * as express from 'express'
+import * as bodyParser from 'body-parser'
+import * as multer from 'multer'
 import * as ReactDOMServer from 'react-dom/server'
 const serverless = require('serverless-http')
 
 export function toExpress(application) {
   const app = express()
+  app.use(bodyParser.json()) // for parsing application/json
+  app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
+  const paramCreator = {
+    [META_BODY]: req => req.body,
+    [META_HEADERS]: req => req.headers,
+    [META_REQ]: req => req,
+    [META_RES]: (req, res) => res,
+    [META_UPLOADED_FILE]: req => req.file
+  }
 
   application.controllers.forEach(controller => {
     Object.getOwnPropertyNames(Object.getPrototypeOf(controller))
       .filter(name => name !== 'contructor')
       .forEach(name => {
         const metaRoute = Reflect.getMetadata(META_ROUTE, controller[name])
-        const metaBody = Reflect.getMetadata(META_BODY, controller[name])
-        const metaHeaders = Reflect.getMetadata(META_HEADERS, controller[name])
-        const metaReq = Reflect.getMetadata(META_REQ, controller[name])
-        const metaRes = Reflect.getMetadata(META_RES, controller[name])
         const metaReactSSR = Reflect.getMetadata(
           META_REACT_SSR,
           controller[name]
         )
+        const metaFileInterceptor = Reflect.getMetadata(
+          META_FILE_INTERCEPTOR,
+          controller[name]
+        )
+        if (metaFileInterceptor) {
+          app.use(multer().single(metaFileInterceptor))
+        }
         if (metaRoute) {
           // 根据签名
           app[metaRoute.method](metaRoute.path, async (req, res) => {
             const routeParams = []
-            if (metaBody !== undefined) routeParams[metaBody] = req.body
-            if (metaHeaders !== undefined)
-              routeParams[metaHeaders] = req.headers
-            if (metaReq !== undefined) routeParams[metaReq] = req
-            if (metaRes !== undefined) routeParams[metaRes] = res
+            for (let metaParamKey in paramCreator) {
+              const paramIndex = Reflect.getMetadata(
+                metaParamKey,
+                controller[name]
+              )
+              if (paramIndex !== undefined) {
+                routeParams[paramIndex] = paramCreator[metaParamKey](req, res)
+              }
+            }
 
             if (metaReactSSR) {
               res.send(

@@ -38,4 +38,9 @@ const inputEvent = {
   }
 }
 
-lambda(inputEvent).then(console.log)
+describe('Adapter for lambda', function() {
+  it('return hello world', async function() {
+    const res = await lambda(inputEvent)
+    assert.strictEqual(res.body, 'hello! stark!')
+  })
+})

@@ -30,13 +30,12 @@ import * as assert from 'assert'
 
 const expressApp = toExpress(application)
 
-describe('Adapter for express', function() {
+describe('Express with React SSR', function() {
   it('should listen for 3000', async function() {
     const res = await request(expressApp)
       .get('/')
       .expect(200)
-
-    console.log(res)
+    assert.strictEqual(res.text, '<div data-reactroot="">Hello World!</div>')
   })
 })
 

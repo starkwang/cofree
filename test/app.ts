@@ -1,4 +1,12 @@
-import { Get, Body, Headers, Req } from '../src/http'
+import {
+  Get,
+  Body,
+  Headers,
+  Req,
+  Post,
+  FileInterceptor,
+  UploadedFile
+} from '../src/http'
 import { Module, Controller } from '../src/module'
 import { Injectable, createApplication } from '../src/ioc'
 
@@ -17,6 +25,21 @@ class FooController {
   @Get('/')
   async index(@Body() body) {
     return this.fooProvider.say()
+  }
+
+  @Post('/')
+  async postIndex(@Body() body) {
+    return body
+  }
+
+  @Post('/upload')
+  @FileInterceptor('avatar')
+  async uploadFile(@Body() body, @Req() req, @UploadedFile() file) {
+    return {
+      ...body,
+      fieldname: file.fieldname,
+      size: file.size
+    }
   }
 }
 
