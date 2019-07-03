@@ -13,7 +13,6 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as multer from 'multer'
 import * as ReactDOMServer from 'react-dom/server'
-import * as resolvePathname from 'resolve-pathname'
 import { resolvePath } from './utils'
 const serverless = require('serverless-http')
 
