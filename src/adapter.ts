@@ -1,4 +1,3 @@
-import * as Router from 'koa-router'
 import {
   META_BODY,
   META_ROUTE,
@@ -7,12 +6,15 @@ import {
   META_RES,
   META_REACT_SSR,
   META_FILE_INTERCEPTOR,
-  META_UPLOADED_FILE
+  META_UPLOADED_FILE,
+  META_CONTROLLER_PATH
 } from './contants'
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as multer from 'multer'
 import * as ReactDOMServer from 'react-dom/server'
+import * as resolvePathname from 'resolve-pathname'
+import { resolvePath } from './utils'
 const serverless = require('serverless-http')
 
 export function toExpress(application) {
@@ -29,6 +31,7 @@ export function toExpress(application) {
   }
 
   application.controllers.forEach(controller => {
+    const controllerPath = Reflect.getMetadata(META_CONTROLLER_PATH, controller)
     Object.getOwnPropertyNames(Object.getPrototypeOf(controller))
       .filter(name => name !== 'contructor')
       .forEach(name => {
@@ -45,8 +48,9 @@ export function toExpress(application) {
           app.use(multer().single(metaFileInterceptor))
         }
         if (metaRoute) {
-          // 根据签名
-          app[metaRoute.method](metaRoute.path, async (req, res) => {
+          // controller path + route path
+          const route = resolvePath(controllerPath, metaRoute.path)
+          app[metaRoute.method](route, async (req, res) => {
             const routeParams = []
             for (let metaParamKey in paramCreator) {
               const paramIndex = Reflect.getMetadata(
@@ -73,30 +77,6 @@ export function toExpress(application) {
   })
 
   return app
-}
-
-export function toKoaRouter(controller) {
-  const instance = new controller()
-  const router = new Router()
-
-  const instancePrototype = Object.getPrototypeOf(instance)
-  Object.getOwnPropertyNames(instancePrototype)
-    .filter(name => name !== 'constructor')
-    .forEach(name => {
-      const handler = instancePrototype[name]
-
-      const metaBody = Reflect.getOwnMetadata(META_BODY, handler)
-
-      const { method, path } = Reflect.getOwnMetadata(META_ROUTE, handler)
-
-      const parameters = []
-      router[method](path, async (ctx, next) => {
-        // todo: metaBody 转真正的 body
-        ctx.body = await handler(...parameters)
-        next()
-      })
-    })
-  return router.routes()
 }
 
 export function toLambda(application) {

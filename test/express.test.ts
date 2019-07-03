@@ -44,4 +44,11 @@ describe('Adapter for express', function() {
       size: 222255
     })
   })
+
+  it('support controller route', async function() {
+    const res = await request(expressApp)
+      .get('/bar')
+      .expect(200)
+    assert.strictEqual(res.text, 'this is bar')
+  })
 })

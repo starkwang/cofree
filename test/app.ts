@@ -32,6 +32,11 @@ class FooController {
     return body
   }
 
+  @Get('/headers')
+  async body(@Headers() headers) {
+    return JSON.stringify(headers)
+  }
+
   @Post('/upload')
   @FileInterceptor('avatar')
   async uploadFile(@Body() body, @Req() req, @UploadedFile() file) {
@@ -43,13 +48,13 @@ class FooController {
   }
 }
 
-@Controller()
+@Controller('bar')
 class BarController {
   constructor(private readonly fooProvider: FooProvider) {}
 
-  @Get('/headers')
-  async body(@Headers() headers) {
-    return JSON.stringify(headers)
+  @Get('/')
+  async index(@Body() body) {
+    return 'this is bar'
   }
 
   async noRoute() {}

@@ -1,4 +1,4 @@
-import { META_MODULE } from './contants'
+import { META_MODULE, META_CONTROLLER_PATH } from './contants'
 
 export function createApplication(module) {
   const moduleMeta = Reflect.getMetadata(META_MODULE, module)
@@ -13,6 +13,10 @@ export function createApplication(module) {
       'design:paramtypes',
       controllerConstructor
     )
+    const controllerPath = Reflect.getMetadata(
+      META_CONTROLLER_PATH,
+      controllerConstructor
+    )
     const controllerContructorParams = []
     controllerConstructorParamsMeta.map(providerConstructor => {
       if (moduleMeta.providers.includes(providerConstructor)) {
@@ -23,9 +27,15 @@ export function createApplication(module) {
       }
     })
 
-    applicationInstance.controllers.push(
-      new controllerConstructor(...controllerContructorParams)
+    const controllerInstance = new controllerConstructor(
+      ...controllerContructorParams
     )
+    Reflect.defineMetadata(
+      META_CONTROLLER_PATH,
+      controllerPath,
+      controllerInstance
+    )
+    applicationInstance.controllers.push(controllerInstance)
   })
 
   return applicationInstance
