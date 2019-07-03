@@ -2,6 +2,8 @@
 
 A Node.js Server Framework for Cloud
 
+[![Build Status](https://travis-ci.org/starkwang/cofree.svg?branch=master)](https://travis-ci.org/starkwang/cofree)
+
 - Typescript ✔️
 - IoC ✔️
 - Easy Testing ✔️
