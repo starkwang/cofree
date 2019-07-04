@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --require ts-node/register",
     "unit-test": "mocha --require ts-node/register ./test/*.test.{ts,tsx}",
-    "lint": "eslint --fix src/*.ts test/*.ts"
+    "lint": "eslint --fix src/*.ts test/*.ts test/*.tsx"
   },
   "author": "",
   "license": "ISC",
