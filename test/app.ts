@@ -18,6 +18,14 @@ class FooProvider {
   }
 }
 
+@Injectable()
+class BarProvider {
+  constructor() {}
+  say() {
+    return 'hello! jarvis!'
+  }
+}
+
 @Controller()
 class FooController {
   constructor(private readonly fooProvider: FooProvider) {}
@@ -61,7 +69,20 @@ class BarController {
 }
 
 @Module({
+  providers: [BarProvider],
+  exports: [BarProvider]
+})
+class BarModule {}
+
+@Module({
+  imports: [BarModule],
+  exports: [BarProvider]
+})
+class Bar2Module {}
+
+@Module({
   controllers: [FooController, BarController],
-  providers: [FooProvider]
+  providers: [FooProvider],
+  imports: [Bar2Module]
 })
 export default class AppModule {}

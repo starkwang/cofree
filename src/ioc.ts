@@ -1,34 +1,50 @@
 import { META_MODULE, META_CONTROLLER_PATH } from './contants'
 
+interface moduleMeta {
+  providers?: Function[]
+  controllers: (new (...args: any[]) => any)[]
+  imports?: Function[]
+  exports?: Function[]
+}
+
 export async function createApplication(module) {
-  const moduleMeta = Reflect.getMetadata(META_MODULE, module)
+  const moduleMeta: moduleMeta = Reflect.getMetadata(META_MODULE, module)
 
   const applicationInstance = {
     controllers: []
   }
 
+  // collect providers
   const providerInstancePool = new InstancePool()
+  collectProvider(module, providerInstancePool)
+  if (moduleMeta.providers && moduleMeta.providers.length > 0) {
+    moduleMeta.providers.forEach(provider => {
+      providerInstancePool.add(provider)
+    })
+  }
+
+  // create controller instance in root module
   moduleMeta.controllers.forEach(controllerConstructor => {
     const controllerConstructorParamsMeta = Reflect.getMetadata(
       'design:paramtypes',
       controllerConstructor
     )
-    const controllerPath = Reflect.getMetadata(
-      META_CONTROLLER_PATH,
-      controllerConstructor
-    )
     const controllerContructorParams = []
     controllerConstructorParamsMeta.map(providerConstructor => {
-      if (moduleMeta.providers.includes(providerConstructor)) {
+      if (providerInstancePool.contains(providerConstructor)) {
         const provider = providerInstancePool.get(providerConstructor)
         controllerContructorParams.push(provider)
       } else {
         throw new Error(`Cannot find provider: ${providerConstructor.name}`)
       }
     })
-
     const controllerInstance = new controllerConstructor(
       ...controllerContructorParams
+    )
+
+    const controllerPath = Reflect.getMetadata(
+      META_CONTROLLER_PATH,
+      controllerConstructor
     )
     Reflect.defineMetadata(
       META_CONTROLLER_PATH,
@@ -41,13 +57,41 @@ export async function createApplication(module) {
   return applicationInstance
 }
 
+function collectProvider(module, providerInstancePool: InstancePool) {
+  const moduleMeta: moduleMeta = Reflect.getMetadata(META_MODULE, module)
+
+  if (moduleMeta.imports && moduleMeta.imports.length > 0) {
+    moduleMeta.imports.forEach(importedModule => {
+      collectProvider(importedModule, providerInstancePool)
+    })
+  }
+
+  if (moduleMeta.exports && moduleMeta.exports.length > 0) {
+    moduleMeta.exports.forEach(exportedProvider => {
+      if (
+        (moduleMeta.providers &&
+          moduleMeta.providers.includes(exportedProvider)) ||
+        providerInstancePool.contains(exportedProvider)
+      ) {
+        providerInstancePool.add(exportedProvider)
+      } else {
+        throw new Error(
+          `Exported provider is not found: ${exportedProvider.name}`
+        )
+      }
+    })
+  }
+}
+
 class InstancePool {
   private _pool
   constructor() {
     this._pool = []
   }
-  add(instance) {
+  add(instanceConstructor) {
+    const instance = new instanceConstructor()
     this._pool.push(instance)
+    return instance
   }
   get(instanceConstructor) {
     for (let i = 0; i < this._pool.length; i++) {
@@ -56,11 +100,16 @@ class InstancePool {
         return instance
       }
     }
-
-    // no instance contained
-    const instance = new instanceConstructor()
-    this._pool.push(instance)
-    return instance
+    return this.add(instanceConstructor)
+  }
+  contains(instanceConstructor) {
+    for (let i = 0; i < this._pool.length; i++) {
+      const instance = this._pool[i]
+      if (instance instanceof instanceConstructor) {
+        return true
+      }
+    }
+    return false
   }
 }
 
