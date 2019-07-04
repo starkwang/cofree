@@ -1,11 +1,15 @@
 import { toExpress } from '../src/adapter'
 import * as request from 'supertest'
 import * as assert from 'assert'
-import application from './app'
-
-const expressApp = toExpress(application)
+import module from './app'
+import { createApplication } from '../src/ioc'
 
 describe('Adapter for express', function() {
+  let expressApp
+  before(async () => {
+    const application = await createApplication(module)
+    expressApp = toExpress(application)
+  })
   it('should listen for 3000', async function() {
     const res = await request(expressApp)
       .get('/')

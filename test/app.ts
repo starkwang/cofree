@@ -8,7 +8,7 @@ import {
   UploadedFile
 } from '../src/http'
 import { Module, Controller } from '../src/module'
-import { Injectable, createApplication } from '../src/ioc'
+import { Injectable } from '../src/ioc'
 
 @Injectable()
 class FooProvider {
@@ -64,6 +64,4 @@ class BarController {
   controllers: [FooController, BarController],
   providers: [FooProvider]
 })
-class AppModule {}
-
-export default createApplication(AppModule)
+export default class AppModule {}

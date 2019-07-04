@@ -1,9 +1,7 @@
 import { toLambda } from '../src/adapter'
-import * as request from 'supertest'
 import * as assert from 'assert'
-import application from './app'
-
-const lambda = toLambda(application)
+import module from './app'
+import { createApplication } from '../src/ioc'
 
 const inputEvent = {
   headerParameters: {},
@@ -39,6 +37,11 @@ const inputEvent = {
 }
 
 describe('Adapter for lambda', function() {
+  let lambda
+  before(async () => {
+    const application = await createApplication(module)
+    lambda = toLambda(application)
+  })
   it('return hello world', async function() {
     const res = await lambda(inputEvent)
     assert.strictEqual(res.body, 'hello! stark!')

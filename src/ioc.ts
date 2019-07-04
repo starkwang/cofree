@@ -1,6 +1,6 @@
 import { META_MODULE, META_CONTROLLER_PATH } from './contants'
 
-export function createApplication(module) {
+export async function createApplication(module) {
   const moduleMeta = Reflect.getMetadata(META_MODULE, module)
 
   const applicationInstance = {
